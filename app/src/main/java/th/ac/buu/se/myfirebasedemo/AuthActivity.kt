@@ -12,6 +12,7 @@ import com.google.android.gms.tasks.Task
 import android.R.attr.password
 import android.util.Log
 import android.R.attr.password
+import android.content.Intent
 
 
 class AuthActivity : AppCompatActivity() {
@@ -35,6 +36,50 @@ class AuthActivity : AppCompatActivity() {
         var btn_regis = findViewById<Button>(R.id.btn_regis)
         var input_email = findViewById<EditText>(R.id.input_email)
         var input_pass = findViewById<EditText>(R.id.input_pass)
+
+        mAuthListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
+            val user = firebaseAuth.currentUser
+            if (user != null) {
+                Log.d("FIREBASENAJA",user.uid)
+                Log.d("FIREBASENAJA",mAuth!!.currentUser!!.email.toString())
+                finish()
+            } else {
+
+            }
+        }
+
+        btn_regis.setOnClickListener {
+            var email = input_email.text.toString()
+            var pass = input_pass.text.toString()
+            if(email == "" || pass == "" ){
+                Toast.makeText(this, "No Email or Pass", Toast.LENGTH_SHORT).show()
+            }else {
+                mAuth!!.createUserWithEmailAndPassword(email, pass)
+            }
+            finish()
+        }
+
+        btn_login.setOnClickListener {
+
+            var email = input_email.text.toString()
+            var pass = input_pass.text.toString()
+
+            if(email == "" || pass == "" ){
+                Toast.makeText(this, "No Email or Pass", Toast.LENGTH_SHORT).show()
+            }else {
+                mAuth!!.signInWithEmailAndPassword(email, pass)
+                    .addOnCompleteListener(this) { task ->
+                        if (!task.isSuccessful) {
+                            Log.w("", "signInWithEmail")
+                            Toast.makeText(this, "Authentication failed.", Toast.LENGTH_SHORT).show()
+                        }else{
+                            var intent = Intent(this.applicationContext, ChatActivity::class.java)
+                            startActivity(intent)
+                        }
+                        // ...
+                    }
+            }
+        }
 
 
 
